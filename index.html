@@ -6,13 +6,14 @@
     <meta name="description" content="WifiAbierto es un proyecto para ayudar a comunidades a establecer redes inalámbricas abiertas" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!--[if lt IE 9]>
-      <script src="{{ static('bower_components/html5shiv/dist/html5shiv.js')}}"></script>
+      <script src="/js/html5shiv.js'"></script>
     <![endif]-->
     <link rel="stylesheet" type="text/css" href="./css/main.css" />
+    <script src="./js/modernizr.js"></script>
   </head>
   <body>
     <div class="wrapper">
-      <nav class="top-bar">
+      <nav class="top-bar" data-topbar>
         <ul class="title-area">
           <li class="name"><h1><a href="./">WifiAbierto</a></h1></li>
           <li class="divider"></li>
@@ -51,5 +52,9 @@
         </footer>
       </div>
     </div>
+    <script src="./js/main.min.js"></script>
+    <script>
+      $(document).foundation();
+    </script>
   </body>
 </html>
