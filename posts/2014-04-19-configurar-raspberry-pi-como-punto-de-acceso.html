@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>WifiAbierto - ¿Cómo configurar un Rasberry Pi como punto de acceso?</title>
+    <meta name="description" content="WifiAbierto es un proyecto para ayudar a comunidades a establecer redes inalámbricas abiertas" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--[if lt IE 9]>
+      <script src="/js/html5shiv.js'"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="../css/main.css" />
+    <script src="../js/modernizr.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <nav class="top-bar" data-topbar>
+        <ul class="title-area">
+          <li class="name"><h1><a href="../">WifiAbierto</a></h1></li>
+          <li class="divider"></li>
+          <li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+        </ul>
+        <section class="top-bar-section">
+          <ul class="right">
+            <!-- <li class="divider"></li> -->
+            <!-- <li><a href="#">Mapa</a></li> -->
+            <li class="divider"></li>
+            <li><a href="../archivo.html">Artículos</a></li>
+            <li class="divider"></li>
+            <li><a href="../comunidad.html">Únete</a></li>
+            <li class="divider"></li>
+          </ul>
+        </section>
+      </nav>
+      
+      <article class="content row">
+        <header class="small-12 columns page-header">
+          <h1>¿Cómo configurar un Rasberry Pi como punto de acceso?</h1>
+        </header>
+        <section class="small-12 columns page-content">
+          <section class="small-12 columns article-content">
+  <h2>Contenidos</h2>
+<ul>
+<li><a href="#ingredientes">Ingredientes</a></li>
+<li><a href="#preparación">Preparación</a><ul>
+<li><a href="#obtener-la-imagen-de-arch-linux-para-arm">1. Obtener la imagen de Arch Linux para ARM</a></li>
+<li><a href="#cargar-la-imagen-de-arch-linux-en-la-tarjeta-sd">2. Cargar la imagen de Arch Linux en la tarjeta SD</a></li>
+<li><a href="#configurar-el-raspberry-pi">3. Configurar el Raspberry Pi</a></li>
+<li><a href="#activar-el-punto-de-acceso">4. Activar el punto de acceso</a></li>
+<li><a href="#y-si-no-hay-un-raspberry-pi">5. ¿Y si no hay un Raspberry Pi?</a></li>
+</ul></li>
+</ul>
+<p>En este artículo se describe cómo configurar un <a href="http://raspberrypi.org/">Raspberry Pi</a> como punto de acceso para una red inalámbrica rápida.</p>
+<p>El Raspberry Pi es un computador del tamaño de una tarjeta bancaria utilizado para la implementación de prototipos de todo tipo en el campo de la computación y la electrónica. Cuenta con un puerto <code>Ethernet</code> y dos puertos <code>USB</code>, lo que lo hace perfecto para una aplicación como <code>punto de acceso</code> inalámbrico.</p>
+<p>En este tutorial, utilizaremos <a href="http://archlinux.org/">Arch Linux</a> como sistema operativo del Raspberry Pi. Esto nos da acceso a actualizaciones recientes y una muy buena disponibilidad de aplicaciones. Además, nos permite utilizar <a href="https://github.com/oblique/create_ap">create_ap</a>, una utilidad para la configuración rápida de puntos de acceso.</p>
+<h2 id="ingredientes">Ingredientes</h2>
+<ul>
+<li>Raspberry Pi</li>
+<li>Tarjeta SD de 2GiB como mínimo</li>
+<li>Adaptador Wireless USB</li>
+<li>Conexión a Internet</li>
+<li>Cable Ethernet</li>
+</ul>
+<h2 id="preparación">Preparación</h2>
+<h3 id="obtener-la-imagen-de-arch-linux-para-arm">1. Obtener la imagen de Arch Linux para ARM</h3>
+<p>Descarga la última imagen de <a href="http://archlinuxarm.org/">Arch Linux para ARM</a> desde la <a href="http://archlinuxarm.org/platforms/armv6/raspberry-pi">página específica para Raspberry Pi</a>.</p>
+<p><a href="http://archlinuxarm.org/os/ArchLinuxARM-rpi-latest.zip">Enlace directo</a></p>
+<p>Al descomprimir el archivo <code>ZIP</code> descargado, obtendrás un archivo <code>IMG</code>, que es una imagen completa del sistema operativo para el Raspberry Pi lista para cargar en la tarjeta SD.</p>
+<h3 id="cargar-la-imagen-de-arch-linux-en-la-tarjeta-sd">2. Cargar la imagen de Arch Linux en la tarjeta SD</h3>
+<p>El procedimiento para <em>quemar</em> la imagen <code>IMG</code> en la tarjeta SD varía de acuerdo al sistema operativo que se utilice, pero es bastante sencillo en todos los casos.</p>
+<h4 id="en-sistemas-tipo-unix">2.1 En sistemas tipo UNIX</h4>
+<p>Si estás usando un sistema operativo <code>UNIX</code>, como <code>Linux</code> o <code>Mac OS</code>, debes identificar la tarjeta SD después de conectarla. Para esto, <strong>antes de conectar la tarjeta</strong>, introduce el siguiente comando en un terminal:</p>
+<pre class="sh"><code>$ ls /dev/sd[a-z]
+/dev/sda /dev/sdb</code></pre>
+<p>Luego puedes introducir la tarjeta SD y repetir el mismo comando:</p>
+<pre class="sh"><code>$ ls /dev/sd[a-z]
+/dev/sda /dev/sdb /dev/sdc</code></pre>
+<p>Como puedes observar en la salida de ejemplo, aparece un nuevo elemento, <code>/dev/sdc</code>. Si no has introducido otro dispositivo en tu computador, esa es la ruta de tu tarjeta SD.</p>
+<p>Con la tarjeta identificada, podemos proceder a cargarle la imagen <code>IMG</code>. Así, ubicado en el directorio donde está la imagen descomprimida, puedes cargar la imagen con el siguiente comando, como usuario <code>root</code>:</p>
+<pre class="sh"><code># ls *.img
+ArchLinuxARM-2014.04-rpi.img
+# dd if=ArchLinuxARM-2014.04-rpi.img of=/dev/sdc bs=1M</code></pre>
+<h4 id="en-sistemas-windows">2.2 En sistemas Windows</h4>
+<p>Si usas Windows, debes primero descargar <a href="https://launchpad.net/win32-image-writer">Win32DiskImager</a> e instalarlo. Una vez instalado, ejecútalo y selecciona el archivo descomprimido <code>IMG</code>, selecciona la letra de disco correspondiente a la tarjeta SD y presiona <code>Write</code>.</p>
+<h3 id="configurar-el-raspberry-pi">3. Configurar el Raspberry Pi</h3>
+<p>Introduce la <em>tarjeta SD</em> con la imagen del sistema operativo cargada en el Raspberry Pi y conecta el <em>cable Ethernet</em> desde el <code>router</code> que te da acceso a internet hasta el puerto correspondiente. Enciéndelo conectando su adaptador de corriente o un cable USB adecuado.</p>
+<p>Al arrancar, el Pi debe obtener una dirección IP asignada de manera dinámica por el <code>router</code>. Puedes averiguar la dirección IP asignada al dispositivo en el panel de configuración de tu router. Por defecto el nombre del Pi es <code>alarmpi</code>.</p>
+<h4 id="ingresar-en-el-pi">3.1 Ingresar en el Pi</h4>
+<p>Para configurar el dispositivo es necesario ingresar en el mismo usando <code>SSH</code>.</p>
+<p>En sistemas tipo <code>UNIX</code>, lo más probable es que ya tengas <code>OpenSSH</code> instalado. Puedes verificar en una línea de comandos:</p>
+<pre class="sh"><code>$ type ssh
+ssh is /usr/bin/ssh</code></pre>
+<p>Si la respuesta del comando es <code>ssh not found</code>, debes instalar OpenSSH haciendo uso del sistema de manejo paquetes de tu sistema.</p>
+<p>En Windows, puedes conectarte a un servidor <code>SSH</code> usando <a href="http://www.putty.org/">PuTTY</a>.</p>
+<p>El usuario y contraseña por defecto es <code>root</code> y <code>root</code>, respectivamente.</p>
+<h4 id="cambiar-la-contraseña-de-root">3.2 Cambiar la contraseña de root</h4>
+<p>El primer cambio a realizar una vez en el Pi, es la contraseña del usuario <code>root</code>. Este cambio es esencial debido a que el equipo va a estar conectado a Internet y sirviendo de punto de acceso. Para esto, ejecuta:</p>
+<pre class="sh"><code># passwd</code></pre>
+<h4 id="actualizar-e-instalar-el-software-necesario">3.2 Actualizar e instalar el software necesario</h4>
+<p>Antes de instalar las aplicaciones necesarias, es buena idea actualizar todo el Software instalado y reiniciar el equipo para garantizar que esté corriendo con el núcleo más nuevo disponible.</p>
+<pre class="sh"><code># pacman -Syyu
+# shutdown -r now</code></pre>
+<p>Al reiniciar y volver a entrar al equipo, después de la actualización, es necesario instalar algunas herramientas básicas en el sistema que sirven para obtener las utilidades para la configuración del punto de acceso más adelante.</p>
+<pre class="sh"><code># pacman -S base-devel yaourt
+# yaourt -Syy</code></pre>
+<p>Finalmente, se instala <a href="https://github.com/oblique/create_ap">create_ap</a>, una utilidad que facilita en gran medida la configuración rápida de un punto de acceso.</p>
+<pre class="sh"><code># yaourt -S create_ap</code></pre>
+<h3 id="activar-el-punto-de-acceso">4. Activar el punto de acceso</h3>
+<p>Activar el punto de acceso es tan fácil como utilizar <code>create_ap</code> para configurarlo e iniciarlo de manera automática. Esta utilidad ofrece varias opciones al usuario, que se pueden visualizar ejecutando <code>create_ap --help</code>.</p>
+<p>Una descripción completa de la funcionalidad de <code>create_ap</code> está fuera del alcance de este artículo, por lo que recomendamos leer el archivo <a href="https://github.com/oblique/create_ap/blob/master/README.md">README</a> del proyecto si llegara a necesitar más detalles.</p>
+<h4 id="iniciar-el-punto-de-acceso-en-la-línea-de-comandos">4.1 Iniciar el punto de acceso en la línea de comandos</h4>
+<p>Para ésta aplicación, crearemos un punto de acceso con las siguientes características:</p>
+<ul>
+<li><strong>Nombre del punto de acceso</strong>: WifiAbierto_0</li>
+<li><strong>Contraseña</strong>: WifiAbierto</li>
+<li><strong>Puerta de enlace</strong>: 10.11.12.1</li>
+</ul>
+<p>Además, si se quisiera compartir la conexión a Internet, es necesario contar con una interfaz de red que ya esté conectada y saber su identificador. <code>create_ap</code> permite compartir la conexión desde la misma interfaz de red inalámbrica que sirve de punto de acceso. En este caso, se utilizará la interfaz de red <code>eth0</code>, correspondiente por defecto a la conexión Ethernet que hemos estado utilizando para trabajar sobre el Raspberry Pi. Por otro lado, el identificador de la interfaz de red inalámbrica es <code>wlan0</code>.</p>
+<p>Con esto definido, se pasan las opciones a <code>create_ap</code> en la línea de comandos de la siguiente manera:</p>
+<pre class="sh"><code># create_ap -g 10.11.12.1 wlan0 eth0 WifiAbierto_0 WifiAbierto</code></pre>
+<p>Esto arrancará el punto de acceso y quedará ejecutándose en el terminal actual. Para <em>apagar</em> el punto de acceso, basta con ingresar <code>Ctrl+c</code>.</p>
+<h4 id="iniciar-el-punto-de-acceso-como-servicio-de-fondo">4.2 Iniciar el punto de acceso como servicio de fondo</h4>
+<p>Debido a que iniciar el punto de acceso en la línea de comandos implicaría mantenerse conectado al Raspberry Pi, es posible activar el punto de acceso como un servicio del sistema.</p>
+<p>Al instalarse, <code>create_ap</code> provee un archivo de ejemplo para la configuración de un servicio del sistema usando <code>systemd</code> que se puede adaptar fácilmente a cada caso. La ruta del archivo es <code>/usr/share/create_ap/create_ap.service.example</code>, y sus contenidos son</p>
+<pre class="config"><code>[Unit]
+Description=Create AP Service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash create_ap -n -g 10.0.0.1 wlan0 AccessPointSSID
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<p>La línea de interés es la que comienza con <code>ExecStart</code>. Ahí es necesario reemplazar la orden siguiente a <code>/usr/bin/bash</code> con la que se utilizó previamente para iniciar el punto de acceso en la línea de comandos. Para comenzar se crea una copia del archivo de ejemplo al directorio de servicios del sistema:</p>
+<pre class="sh"><code># cp /usr/share/create_ap/create_ap.service.example /etc/systemd/system/punto_de_acceso.service</code></pre>
+<p>Posteriormente se modifica el archivo usando <code>nano</code>, un pequeño editor de archivos.</p>
+<pre class="sh"><code># nano /etc/systemd/system/punto_de_acceso.service</code></pre>
+<p>Se actualiza la opción <code>ExecStart</code> para utilizar la orden de arranque del punto de acceso. También se puede editar la descripción:</p>
+<pre class="config"><code>[Unit]
+Description=Iniciar punto de acceso WifiAbierto_0
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash create_ap -g 10.11.12.1 wlan0 eth0 WifiAbierto_0 WifiAbierto
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<p>Posiblemente sea necesario recargar el manejador de servicios para tomar el nuevo archivo:</p>
+<pre class="sh"><code># systemctl daemon-reload</code></pre>
+<p>Para iniciar el servicio en el fondo, basta ahora con ejecutar:</p>
+<pre class="sh"><code># systemctl start punto_de_acceso</code></pre>
+<p>Se puede verificar el estado del servicio con la orden:</p>
+<pre class="sh"><code># systemctl status punto_de_acceso</code></pre>
+<p>Y <em>apagar</em> el servicio con:</p>
+<pre class="sh"><code># systemctl stop punto_de_acceso</code></pre>
+<p>Si se desea que el punto de acceso se inicie cada vez que arranque el Raspberry Pi, se debe <em>activar</em> el servicio:</p>
+<pre class="sh"><code># systemctl enable punto_de_acceso</code></pre>
+<h3 id="y-si-no-hay-un-raspberry-pi">5. ¿Y si no hay un Raspberry Pi?</h3>
+<p>Este procedimiento se puede realizar practicamente sin modificaciones en un computador, que bien puede ser uno abandonado de baja gama. Una laptop vieja cuya tarjeta inalámbrica soporte el modo promiscuo soporta sin problemas este procedimiento, igualmente.</p>
+<p>Si deseas intentarlo, podemos ayudarte a través del <a href="https://kiwiirc.com/client/irc.unplug.org.ve/wifiabierto">canal de IRC</a> y de la <script type="text/javascript">
+<!--
+h='&#108;&#x69;&#98;&#114;&#x65;&#108;&#x69;&#x73;&#116;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x77;&#x69;&#102;&#x69;&#x61;&#98;&#x69;&#x65;&#114;&#116;&#x6f;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'lista de correos'+'<\/'+'a'+'>');
+// -->
+</script><noscript>lista de correos (wifiabierto at librelist dot com)</noscript>.</p>
+</section>
+<footer class="small-12 columns article-info">
+  <p>Publicado el: 19 de Abril de 2014</p>
+  
+  <p>Por: Sebastián Magrí</p>
+  
+  
+  <p><small><a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike International License</a></small></p>
+  
+</footer>
+
+        </section>
+      </article>
+      <div class="row">
+        <footer class="page-footer">
+          <a href="https://twitter.com/wifiabierto">@WifiAbierto</a>
+        </footer>
+      </div>
+    </div>
+    <script src="../js/main.min.js"></script>
+    <script>
+      $(document).foundation();
+    </script>
+  </body>
+</html>
